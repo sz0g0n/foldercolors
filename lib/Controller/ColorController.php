@@ -23,10 +23,17 @@ class ColorController extends Controller {
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
 	public function saveColor(string $folderId, string $color): JSONResponse {
-		$query = $this->db->prepare(
-			'INSERT INTO `*PREFIX*folder_colors` (`folder_id`, `color`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `color` = ?',
+		$updated = $this->db->executeStatement(
+			'UPDATE `*PREFIX*folder_colors` SET `color` = ? WHERE `folder_id` = ?',
+			[$color, $folderId],
 		);
-		$query->execute([$folderId, $color, $color]);
+
+		if ($updated === 0) {
+			$this->db->executeStatement(
+				'INSERT INTO `*PREFIX*folder_colors` (`folder_id`, `color`) VALUES (?, ?)',
+				[$folderId, $color],
+			);
+		}
 
 		return new JSONResponse(['status' => 'success']);
 	}
@@ -34,11 +41,11 @@ class ColorController extends Controller {
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
 	public function getColor(string $folderId): JSONResponse {
-		$query = $this->db->prepare(
+		$result = $this->db->executeQuery(
 			'SELECT `color` FROM `*PREFIX*folder_colors` WHERE `folder_id` = ?',
+			[$folderId],
 		);
-		$query->execute([$folderId]);
-		$color = $query->fetchColumn();
+		$color = $result->fetchOne();
 
 		return new JSONResponse(['color' => $color ?: null]);
 	}

@@ -1,13 +1,24 @@
 // Base Field class
-// Base Field class
 export class Field {
     label: string;
     value: any;
-    input : HTMLInputElement | null = null;
+    input: HTMLInputElement | null = null;
 
     constructor(label: string, value: any = '') {
         this.label = label;
         this.value = value;
+    }
+
+    buildRow(input: HTMLInputElement): HTMLDivElement {
+        const labelElement = document.createElement('label');
+        labelElement.className = 'fc-field-label';
+        labelElement.innerText = this.label;
+
+        const container = document.createElement('div');
+        container.className = 'fc-field-row';
+        container.appendChild(labelElement);
+        container.appendChild(input);
+        return container;
     }
 
     render(): HTMLElement {
@@ -21,14 +32,7 @@ export class Field {
             this.value = (event.target as HTMLInputElement).value;
         });
 
-        const labelElement = document.createElement('label');
-        labelElement.innerText = this.label;
-
-        const container = document.createElement('div');
-        container.className ="input-list-element"
-        container.appendChild(labelElement);
-        container.appendChild(input);
-        return container;
+        return this.buildRow(input);
     }
 }
 
@@ -39,8 +43,11 @@ export class TextField extends Field {
     }
 
     render(): HTMLElement {
-        const container = super.render()
-        if(this.input) this.input.type = 'text';
+        const container = super.render();
+        if (this.input) {
+            this.input.type = 'text';
+            this.input.className = 'fc-text-input';
+        }
         return container;
     }
 }
@@ -52,8 +59,11 @@ export class ColorField extends Field {
     }
 
     render(): HTMLElement {
-        const container = super.render()
-        if(this.input) this.input.type = 'color';
+        const container = super.render();
+        if (this.input) {
+            this.input.type = 'color';
+            this.input.className = 'fc-color-input';
+        }
         return container;
     }
 }
@@ -62,9 +72,9 @@ export class FormModal {
     fields: Field[];
     modalId: string;
     onSubmit: (formData: { [key: string]: any }) => void;
-    title : string;
+    title: string;
 
-    constructor(fields: Field[], modalId: string = 'formModal', title : string = "") {
+    constructor(fields: Field[], modalId: string = 'formModal', title: string = '') {
         this.fields = fields;
         this.modalId = modalId;
         this.onSubmit = () => null; // Initialize with an empty function to avoid errors
@@ -77,33 +87,36 @@ export class FormModal {
 
     render(): HTMLElement {
         const form = document.createElement('form');
-        const title = document.createElement('h1')
-        title.className = 'modal-form-title'
-        title.innerText = this.title
-        form.appendChild(title)
+        form.className = 'fc-form';
+
+        const title = document.createElement('h1');
+        title.className = 'fc-modal-title';
+        title.innerText = this.title;
+        form.appendChild(title);
 
         // Iterate over each field and append its rendered HTML to the form
-        this.fields.forEach(field => {
-            const fieldElement = field.render();
-            form.appendChild(fieldElement);
+        this.fields.forEach((field) => {
+            form.appendChild(field.render());
         });
 
         // Create Submit and Cancel buttons
-        const submitButton = document.createElement('button');
-        submitButton.type = 'submit';
-        submitButton.innerText = 'Submit';
+        const actions = document.createElement('div');
+        actions.className = 'fc-modal-actions';
 
         const cancelButton = document.createElement('button');
         cancelButton.type = 'button';
+        cancelButton.className = 'fc-btn fc-btn-cancel';
         cancelButton.innerText = 'Cancel';
         cancelButton.addEventListener('click', () => this.close());
 
-        // Append buttons to the form
-        const buttonContainer = document.createElement('div');
-        buttonContainer.className="modal-button-container"
-        buttonContainer.appendChild(cancelButton);
-        buttonContainer.appendChild(submitButton);
-        form.appendChild(buttonContainer);
+        const submitButton = document.createElement('button');
+        submitButton.type = 'submit';
+        submitButton.className = 'fc-btn fc-btn-submit';
+        submitButton.innerText = 'Submit';
+
+        actions.appendChild(cancelButton);
+        actions.appendChild(submitButton);
+        form.appendChild(actions);
 
         // Handle form submission
         form.addEventListener('submit', (event) => {
@@ -111,13 +124,16 @@ export class FormModal {
             const formData: { [key: string]: any } = {};
 
             // Collect values of all fields
-            this.fields.forEach(field => {
+            this.fields.forEach((field) => {
                 formData[field.label] = field.value;
             });
 
-            // Trigger onSubmit callback
-            if (this.onSubmit) {
-                this.onSubmit(formData);
+            try {
+                Promise.resolve(this.onSubmit(formData)).catch((error) => {
+                    console.error('foldercolor: could not save color', error);
+                });
+            } catch (error) {
+                console.error('foldercolor: could not save color', error);
             }
 
             // Close the modal after submission
@@ -127,12 +143,12 @@ export class FormModal {
         // Create modal container
         const modalWrapper = document.createElement('div');
         modalWrapper.id = this.modalId;
-        modalWrapper.className = 'modal';
+        modalWrapper.className = 'fc-modal';
         modalWrapper.appendChild(form);
 
         // Overlay for closing modal
         const overlay = document.createElement('div');
-        overlay.className = 'modal-overlay';
+        overlay.className = 'fc-modal-overlay';
         overlay.addEventListener('click', () => this.close());
 
         // Append modal and overlay to the body
@@ -149,7 +165,7 @@ export class FormModal {
 
     close() {
         const modal = document.getElementById(this.modalId);
-        const overlay = document.querySelector('.modal-overlay');
+        const overlay = document.querySelector('.fc-modal-overlay');
         if (modal) modal.remove();
         if (overlay) overlay.remove();
     }
