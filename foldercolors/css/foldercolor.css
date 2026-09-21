@@ -1,0 +1,115 @@
+/* Colorear solo el icono principal de carpeta, sin afectar overlays ni tamaño */
+tr[data-foldercolor] .files-list__row-icon > .material-design-icon:not(.files-list__row-icon-overlay) svg path {
+    fill: var(--foldercolor) !important;
+}
+
+/* --- Color picker modal, styled with Nextcloud theme variables --- */
+
+.fc-modal-overlay {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+    z-index: 20000;
+}
+
+.fc-modal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 20001;
+    width: 100%;
+    max-width: 420px;
+    box-sizing: border-box;
+    padding: 20px;
+    border: 1px solid var(--color-border, rgba(127, 127, 127, 0.4));
+    border-radius: var(--border-radius-large, 12px);
+    background-color: var(--color-main-background, #ffffff);
+    color: var(--color-main-text, #222222);
+    box-shadow: 0 0 0 1px var(--color-background-darker, rgba(0, 0, 0, 0.08)),
+        0 12px 28px -8px rgba(0, 0, 0, 0.25);
+    font-family: var(--font-face, system-ui, -apple-system, sans-serif);
+}
+
+.fc-modal-title {
+    margin: 0 0 16px;
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--color-main-text, #222222);
+}
+
+.fc-field-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    min-height: 40px;
+}
+
+.fc-field-label {
+    font-size: var(--default-font-size, 15px);
+    color: var(--color-main-text, #222222);
+}
+
+.fc-color-input {
+    width: 52px;
+    height: 34px;
+    padding: 2px;
+    border: 1px solid var(--color-border, rgba(127, 127, 127, 0.4));
+    border-radius: var(--border-radius, 6px);
+    background-color: var(--color-main-background, #ffffff);
+    cursor: pointer;
+}
+
+.fc-text-input {
+    box-sizing: border-box;
+    padding: 6px 10px;
+    border: 1px solid var(--color-border, rgba(127, 127, 127, 0.4));
+    border-radius: var(--border-radius, 6px);
+    background-color: var(--color-main-background, #ffffff);
+    color: var(--color-main-text, #222222);
+    font-size: var(--default-font-size, 15px);
+}
+
+.fc-modal-actions {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.fc-btn {
+    padding: 8px 18px;
+    border-radius: var(--border-radius, 6px);
+    border: 1px solid transparent;
+    font-size: var(--default-font-size, 15px);
+    cursor: pointer;
+    transition: background-color 0.1s ease;
+}
+
+.fc-btn-cancel {
+    background-color: var(--color-background-hover, rgba(127, 127, 127, 0.15));
+    border-color: var(--color-border, rgba(127, 127, 127, 0.4));
+    color: var(--color-main-text, #222222);
+}
+
+.fc-btn-cancel:hover {
+    background-color: var(--color-background-dark, rgba(127, 127, 127, 0.25));
+}
+
+.fc-btn-submit {
+    background-color: var(--color-primary, var(--color-primary-element, #00679e));
+    border-color: var(--color-primary, var(--color-primary-element, #00679e));
+    color: var(--color-primary-text, #ffffff);
+}
+
+.fc-btn-submit:hover {
+    filter: brightness(1.08);
+}
